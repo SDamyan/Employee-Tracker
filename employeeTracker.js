@@ -1,5 +1,6 @@
 const mysql = require("mysql");
 const inquirer = require("inquirer");
+const cTable = require('console.table');
 
 
 // create the connection information for the sql database
@@ -14,7 +15,7 @@ const connection = mysql.createConnection({
 
   // Your password
   password: "",
-  database: "greatBay_DB"
+  database: "employeeTracker_DB"
 });
 
 // connect to the mysql server and sql database
@@ -62,11 +63,16 @@ function viewFunc() {
         message: "What table would you like to view?",
         choices: ["DEPARTMENT", "ROLE", "EMPLOYEE"]
       },
-
-// query the database for user's selected table
-  connection.query(`SELECT * FROM ${answer.list}`, function(err, results) {
-    if (err) throw err;
-    
+    ])
+    .then(answers => {
+      // query the database for user's selected table
+      connection.query(`SELECT * FROM ${answers.viewDeptRoleEmploy}`, function(err, results) {
+      if (err) throw err;
+      console.table(`${answers.viewDeptRoleEmploy}`);
+      start();
+      });
+    });
+  };
     
 /* 
 function addFunc() {
@@ -161,10 +167,5 @@ function updateFunc() {
               // bid wasn't high enough, so apologize and start over
               console.log("Your bid was too low. Try again...");
               start();
-            }
-          });
-      });
-    }
-    
-}
-         */
+            ])
+          */
