@@ -64,11 +64,11 @@ function viewFunc() {
         choices: ["DEPARTMENT", "ROLE", "EMPLOYEE"]
       },
     ])
-    .then(answers => {
+    .then(answer => {
       // query the database for user's selected table
-      connection.query(`SELECT * FROM ${answers.viewDeptRoleEmploy}`, function(err, results) {
+      connection.query(`SELECT * FROM ${answer.viewDeptRoleEmploy}`, function(err, results) {
       if (err) throw err;
-      console.table(`SELECT * FROM ${answers.viewDeptRoleEmploy}`);
+      console.table(`SELECT * FROM ${answer.viewDeptRoleEmploy}`);
       start();
       });
     });
@@ -97,7 +97,7 @@ function addFunc() {
         
       // when finished prompting, insert a new item into the db with that info
       connection.query(
-        `INSERT INTO  ${answers.addChoice} table?`,
+        `INSERT INTO  ${answer.addChoice} table?`,
        /*  {
           item_name: answer.item,
           category: answer.category,
@@ -129,15 +129,15 @@ function updateFunc() {
     .then(function(answer) {
       // get the information of the chosen item
       connection.query(
-          `UPDATE ${answers.updateChoice} table SET ? WHERE ?`,
-          [
+          `UPDATE ${answer.updateChoice} table SET ? WHERE ?`,
+          /* [
             {
               highest_bid: answer.bid
             },
             {
               id: chosenItem.id
             }
-          ],
+          ], */
           function(error) {
             if (error) throw err;
             console.log("Table updated successfully!");
