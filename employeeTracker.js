@@ -68,104 +68,79 @@ function viewFunc() {
       // query the database for user's selected table
       connection.query(`SELECT * FROM ${answers.viewDeptRoleEmploy}`, function(err, results) {
       if (err) throw err;
-      console.table(`${answers.viewDeptRoleEmploy}`);
+      console.table(`SELECT * FROM ${answers.viewDeptRoleEmploy}`);
       start();
       });
     });
   };
     
-/* 
+ 
 function addFunc() {
-// once you have the items, prompt the user for which they'd like to bid on
+// prompt the user for which table they would like to add to.
     inquirer
       .prompt([
         {
-          name: "choice",
-          type: "rawlist",
-          choices: function() {
-            var choiceArray = [];
-            for (var i = 0; i < results.length; i++) {
-              choiceArray.push(results[i].item_name);
-            }
-            return choiceArray;
-          },
-          message: "What auction would you like to place a bid in?"
+          name: "addChoice",
+          type: "list",
+          message: "Which table would you like to add to?",
+          choices: ["DEPARTMENT", "ROLE", "EMPLOYEE"]
         },
-        {
-          name: "bid",
-          type: "input",
-          message: "How much would you like to bid?"
-        }
       ])
       .then(function(answer) {
         // get the information of the chosen item
-        var chosenItem;
+        
+        /* var chosenTable;
         for (var i = 0; i < results.length; i++) {
           if (results[i].item_name === answer.choice) {
-            chosenItem = results[i];
-          }
-        }
-
-
-
-
-
-      {
-        name: "startingBid",
-        type: "input",
-        message: "What would you like your starting bid to be?",
-        validate: function(value) {
-          if (isNaN(value) === false) {
-            return true;
-          }
-          return false;
-        }
-      }
-    ])
-    .then(function(answer) {
+            chosenTable = results[i];
+          } */
+        
       // when finished prompting, insert a new item into the db with that info
       connection.query(
-        "INSERT INTO auctions SET ?",
-        {
+        `INSERT INTO  ${answers.addChoice} table?`,
+       /*  {
           item_name: answer.item,
           category: answer.category,
           starting_bid: answer.startingBid || 0,
           highest_bid: answer.startingBid || 0
-        },
+        }, */
         function(err) {
           if (err) throw err;
-          console.log("Your auction was created successfully!");
+          console.log("Your item was added successfully!");
           // re-prompt the user for if they want to bid or post
           start();
         }
       );
     });
 };
+
   
 function updateFunc() {
-    // determine if bid was high enough
-            if (chosenItem.highest_bid < parseInt(answer.bid)) {
-              // bid was high enough, so update db, let the user know, and start over
-              connection.query(
-                "UPDATE auctions SET ? WHERE ?",
-                [
-                  {
-                    highest_bid: answer.bid
-                  },
-                  {
-                    id: chosenItem.id
-                  }
-                ],
-                function(error) {
-                  if (error) throw err;
-                  console.log("Bid placed successfully!");
-                  start();
-                }
-              );
+// prompt the user for which table they would like to update.
+    inquirer
+    .prompt([
+      {
+        name: "updateChoice",
+        type: "list",
+        message: "Which table would you like to add to?",
+        choices: ["DEPARTMENT", "ROLE", "EMPLOYEE"]
+      },
+    ])
+    .then(function(answer) {
+      // get the information of the chosen item
+      connection.query(
+          `UPDATE ${answers.updateChoice} table SET ? WHERE ?`,
+          [
+            {
+              highest_bid: answer.bid
+            },
+            {
+              id: chosenItem.id
             }
-            else {
-              // bid wasn't high enough, so apologize and start over
-              console.log("Your bid was too low. Try again...");
-              start();
-            ])
-          */
+          ],
+          function(error) {
+            if (error) throw err;
+            console.log("Table updated successfully!");
+            start();
+          }
+        )
