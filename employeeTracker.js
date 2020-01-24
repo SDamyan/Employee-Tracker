@@ -73,13 +73,13 @@ function viewFunc() {
       .prompt([
         {
           name: "wishContinue",
-          type: "choice",
+          type: "list",
           message: "Would you like to continue?",
           choices: ["yes", "no"]
         },
       ])
       .then(answer => { 
-        if (answer.choice === "yes") {
+        if (answer.wishContinue === "yes") {
           start();
         } else{
           connection.end();
@@ -115,12 +115,12 @@ function viewFunc() {
             
             } else{
               connection.end();
-          }
+          };
           
         });
-    };    
+    }    
  //function to add to department table
- addDepFunc() {
+ function addDepFunc() {
     inquirer
     .prompt([
       {
@@ -146,13 +146,13 @@ function viewFunc() {
       .prompt([
         {
           name: "wishContinue",
-          type: "choice",
+          type: "list",
           message: "Would you like to continue?",
           choices: ["yes", "no"]
         },
       ])
       .then(answer => { 
-        if (answer.choice === "yes") {
+        if (answer.wishContinue === "yes") {
           start();
         } else{
           connection.end();
@@ -163,7 +163,11 @@ function viewFunc() {
     });
  };
 
-addRoleFunc() {
+function addRoleFunc() {
+  connection.query("SELECT * FROM role", function(err, results) {
+    if (err) throw err;
+    // once you have the items, prompt the user for which they'd like to bid on
+    inquirer
     inquirer
     .prompt([
       {
@@ -178,13 +182,30 @@ addRoleFunc() {
       },
       {
         name: "roleDeptIDAdd",
-        type: "list",
-        message: "What department ID would you like to add this role to?",
-        //todo add dynamically choices in some kind of for loop
-        //todo to show choices already entered in the dept table
+        type: "rawlist",
+
+        choices: function() {
+          let choiceArray = [];
+          for (var i = 0; i < results.length; i++) {
+            choiceArray.push(results[i].department.id);
+            //todo need to fix id of foreign key. Rename it in the schema?
+          }
+          return choiceArray;
+        },
+        message: "What department ID would you like to add to this role?",
       }
+
+    
     ])
     .then(function(answer) {
+      // get the information of the chosen item
+      let chosenItem;
+      for (var i = 0; i < results.length; i++) {
+        if (results[i].department.id === answer.roleDeptIDAdd) {
+          chosenItem = results[i];
+        }
+      }
+
       // when finished prompting, insert a new item into the db with that info
       connection.query(
         "INSERT INTO role SET ?",
@@ -192,6 +213,7 @@ addRoleFunc() {
           title: answer.roleTitleAdd,
           salary: answer.roleSalaryAdd,
           department_id: answer.roleDeptIDAdd
+          //todo correct id here? or should I use the results through the for loop?
         },
         function(err) {
           if (err) throw err;
@@ -202,13 +224,13 @@ addRoleFunc() {
       .prompt([
         {
           name: "wishContinue",
-          type: "choice",
+          type: "list",
           message: "Would you like to continue?",
           choices: ["yes", "no"]
         },
       ])
       .then(answer => { 
-        if (answer.choice === "yes") {
+        if (answer.wishContinue === "yes") {
           start();
         } else{
           connection.end();
@@ -218,11 +240,12 @@ addRoleFunc() {
         }
       );
     });
-};
+});
+}
 
-addEmployeeFunc() {
-   
-} 
+/* 
+function addEmployeeFunc() {
+}; */
 
 
 
