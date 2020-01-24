@@ -136,27 +136,93 @@ function viewFunc() {
         VALUES ?`,
          {
           name: answer.addDepName
-        },
-         
+        }, 
         function(err) {
           if (err) throw err;
           console.log("Your item was added successfully!");
-          // re-prompt the user for if they want to bid or post
+      
+      // re-prompt the user for if they want to change other tables
+      inquirer
+      .prompt([
+        {
+          name: "wishContinue",
+          type: "choice",
+          message: "Would you like to continue?",
+          choices: ["yes", "no"]
+        },
+      ])
+      .then(answer => { 
+        if (answer.choice === "yes") {
           start();
+        } else{
+          connection.end();
+        }
+      });
         }
       );
-    }
+    });
  };
 
- addRoleFunc() {
-   
+addRoleFunc() {
+    inquirer
+    .prompt([
+      {
+        name: "roleTitleAdd",
+        type: "input",
+        message: "What is the title of the role you would like to add?"
+      },
+      {
+        name: "roleSalaryAdd",
+        type: "input",
+        message: "What is the salary of this role that you would like to add?"
+      },
+      {
+        name: "roleDeptIDAdd",
+        type: "list",
+        message: "What department ID would you like to add this role to?",
+        //todo add dynamically choices in some kind of for loop
+        //todo to show choices already entered in the dept table
+      }
+    ])
+    .then(function(answer) {
+      // when finished prompting, insert a new item into the db with that info
+      connection.query(
+        "INSERT INTO role SET ?",
+        {
+          title: answer.roleTitleAdd,
+          salary: answer.roleSalaryAdd,
+          department_id: answer.roleDeptIDAdd
+        },
+        function(err) {
+          if (err) throw err;
+          console.log("Your auction was created successfully!");
+          
+// see if they want to continue or not
+      inquirer
+      .prompt([
+        {
+          name: "wishContinue",
+          type: "choice",
+          message: "Would you like to continue?",
+          choices: ["yes", "no"]
+        },
+      ])
+      .then(answer => { 
+        if (answer.choice === "yes") {
+          start();
+        } else{
+          connection.end();
+        }
+      });
+
+        }
+      );
+    });
 };
 
 addEmployeeFunc() {
    
-}
-  
-
+} 
 
 
 
