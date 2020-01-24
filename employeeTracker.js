@@ -68,42 +68,76 @@ function viewFunc() {
       // query the database for user's selected table
       connection.query(`SELECT * FROM ${answer.viewDeptRoleEmploy}`, function(err, results) {
       if (err) throw err;
-      console.table(`SELECT * FROM ${answer.viewDeptRoleEmploy}`);
-      start();
+      console.table(results)
+      inquirer
+      .prompt([
+        {
+          name: "wishContinue",
+          type: "choice",
+          message: "Would you like to continue?",
+          choices: ["yes", "no"]
+        },
+      ])
+      .then(answer => { 
+        if (answer.choice === "yes") {
+          start();
+        } else{
+          connection.end();
+        }
+      });
       });
     });
   };
-    
- 
-function addFunc() {
-// prompt the user for which table they would like to add to.
+
+
+
+  function addFunc() {
+    // prompt the user for which table they would like to add to.
+        inquirer
+          .prompt([
+            {
+              name: "addChoice",
+              type: "list",
+              message: "Which table would you like to add to?",
+              choices: ["DEPARTMENT", "ROLE", "EMPLOYEE"]
+            },
+          ])
+          .then(function(answer) {
+            // get the information of the chosen item
+            if (answer.addChoice === "DEPARTMENT") {
+              addDepFunc();
+            }
+            else if(answer.addChoice === "ROLE") {
+              addRoleFunc();
+            }  
+            else if(answer.addChoice === "EMPLOYEE") {
+              addEmployeeFunc();
+            
+            } else{
+              connection.end();
+          }
+          
+        });
+    };    
+ //function to add to department table
+ addDepFunc() {
     inquirer
-      .prompt([
-        {
-          name: "addChoice",
-          type: "list",
-          message: "Which table would you like to add to?",
-          choices: ["DEPARTMENT", "ROLE", "EMPLOYEE"]
-        },
-      ])
-      .then(function(answer) {
-        // get the information of the chosen item
-        
-        /* var chosenTable;
-        for (var i = 0; i < results.length; i++) {
-          if (results[i].item_name === answer.choice) {
-            chosenTable = results[i];
-          } */
-        
+    .prompt([
+      {
+        name: "addDepName",
+        type: "input",
+        message: "What is the name of the department that you would like to add?",
+      },
+    ])
+    .then(function(answer) {
       // when finished prompting, insert a new item into the db with that info
       connection.query(
-        `INSERT INTO  ${answer.addChoice} table?`,
-       /*  {
-          item_name: answer.item,
-          category: answer.category,
-          starting_bid: answer.startingBid || 0,
-          highest_bid: answer.startingBid || 0
-        }, */
+        `INSERT INTO  department (name)
+        VALUES ?`,
+         {
+          name: answer.addDepName
+        },
+         
         function(err) {
           if (err) throw err;
           console.log("Your item was added successfully!");
@@ -111,10 +145,21 @@ function addFunc() {
           start();
         }
       );
-    });
+    }
+ };
+
+ addRoleFunc() {
+   
 };
 
+addEmployeeFunc() {
+   
+}
   
+
+
+
+
 function updateFunc() {
 // prompt the user for which table they would like to update.
     inquirer
