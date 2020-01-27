@@ -2,9 +2,6 @@ const mysql = require("mysql");
 const inquirer = require("inquirer");
 const cTable = require('console.table');
 const figlet = require('figlet');
-const addFile = require ('./add');
-const viewFile = require ('./view');
-const addupdate = require ('./update');
 
 
 // create the connection information for the sql database
@@ -177,7 +174,6 @@ function addRoleFunc() {
     if (err) throw err;
     // once you have the items, prompt the user for which they'd like to bid on
     inquirer
-    inquirer
     .prompt([
       {
         name: "roleTitleAdd",
@@ -199,10 +195,10 @@ function addRoleFunc() {
 
           for (var i = 0; i < results.length; i++) {
             choiceArray.push({ name: results[i].title, value: results[i].department_id });
-            //todo need to fix id of foreign key. Rename it in the schema?
           }
           return choiceArray;
         },
+
         message: "What department ID would you like to add to this role?",
       }
 
@@ -243,10 +239,99 @@ function addRoleFunc() {
       );
     });
 });
-}
-/* 
+};
+
+
+
+
 function addEmployeeFunc() {
-}; */
+  connection.query("SELECT * FROM employee", function(err, results) {
+    if (err) throw err;
+    // once you have the items, prompt the user for which they'd like to bid on
+    inquirer
+    .prompt([
+      {
+        name: "employeeFirstAdd",
+        type: "input",
+        message: "What is the first name of the employee that you would like to add?"
+      },
+      {
+        name: "employeeLastAdd",
+        type: "input",
+        message: "What is the last name of the employee that you would like to add?"
+      },
+      {
+        name: "employeeRoleIDAdd",
+        type: "rawlist",
+
+        choices: function() {
+          let choiceArray = [];
+          console.log(results);
+
+          for (var i = 0; i < results.length; i++) {
+            choiceArray.push({ name: results[i].title, value: results[i].role_id});
+          }
+          return choiceArray;
+        },
+        message: "What role ID would you like to add to this employee?",
+      },
+
+      {
+        name: "employeeManagerIDAdd",
+        type: "rawlist",
+
+        choices: function() {
+          let choiceArray2 = [];
+          console.log(results);
+
+          for (var i = 0; i < results.length; i++) {
+            choiceArray2.push({ name: results[i].title, value: results[i].manager_id});
+          }
+          return choiceArray2;
+        },
+        message: "What manager ID would you like to add to this employee?",
+      } 
+
+    ])
+
+    .then(function(answer) {
+      // when finished prompting, insert a new item into the db with that info
+      connection.query(
+        "INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUES (?)",
+        [ [
+            answer.employeeFirstAdd,
+            answer.employeeLastAdd,
+            answer.employeeRoleIDAdd,
+            answer.employeeManagerIDAdd
+        ] ],
+        function(err) {
+          if (err) throw err;
+          console.log("Your employee was created successfully!");
+          
+// see if they want to continue or not
+      inquirer
+      .prompt([
+        {
+          name: "wishContinue",
+          type: "list",
+          message: "Would you like to continue?",
+          choices: ["yes", "no"]
+        },
+      ])
+      .then(answer => { 
+        if (answer.wishContinue === "yes") {
+          start();
+        } else{
+          connection.end();
+        }
+      });
+
+        }
+      );
+    });
+});
+};
+ 
 
 
 /* 
