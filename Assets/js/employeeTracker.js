@@ -15,7 +15,7 @@ const connection = mysql.createConnection({
   user: "root",
 
   // Your password
-  password: "",
+  password: "Password123",
   database: "employeeTracker_DB"
 });
 
@@ -331,10 +331,8 @@ function addEmployeeFunc() {
     });
 });
 };
- 
 
 
-/* 
 function updateFunc() {
   // prompt the user for which table they would like to update.
       inquirer
@@ -342,25 +340,97 @@ function updateFunc() {
         {
           name: "updateChoice",
           type: "list",
-          message: "Which table would you like to add to?",
+          message: "Which table would you like to update?",
           choices: ["DEPARTMENT", "ROLE", "EMPLOYEE"]
         },
       ])
+
       .then(function(answer) {
         // get the information of the chosen item
-        connection.query(
-            `UPDATE ${answer.updateChoice} table SET ? WHERE ?`,
-            /* [
-              {
-                highest_bid: answer.bid
-              },
-              {
-                id: chosenItem.id
-              }
-            ], 
-            function(error) {
-              if (error) throw err;
-              console.log("Table updated successfully!");
-              start();
-            }
-          ) */
+        if (answer.updateChoice === "DEPARTMENT") {
+          updateDepFunc();
+        }
+        else if(answer.updateChoice === "ROLE") {
+          updateRoleFunc();
+        }  
+        else if(answer.updateChoice === "EMPLOYEE") {
+          updateEmployeeFunc();
+        
+        } else{
+          connection.end();
+      };
+    });
+  }
+
+   //function to update to the department table
+ function updateDepFunc() {
+  connection.query("SELECT * FROM department", function(err, results) {
+    if (err) throw err;
+  inquirer
+  .prompt([
+    {
+      name: "updateDepChoice",
+      type: "rawlist",
+      choices: function() {
+        let choiceArray = [];
+        console.log(results);
+
+        for (var i = 0; i < results.length; i++) {
+          choiceArray.push({ name: results[i].title, value: results[i].name });
+        }
+        return choiceArray;
+      },
+      message: "What is the name of the department that you would like to update?"
+    },
+    {
+      name: "updateDepName",
+      type: "input",
+      message: "What is the NEW name of the department that you would like to change it to?"
+    }
+  ])
+
+  .then(function(answer) {
+    // when finished prompting, update a new item into the db with that info
+    connection.query(
+      `UPDATE department SET ? WHERE ?`,
+      [
+        {
+          name: answer.updateDepChoice
+        },
+        {
+          name: answer.updateDepName
+        }
+      ], 
+      //[[answer.updateDepName]], 
+      function(err) {
+        if (err) throw err;
+        console.log("Your item was updated successfully!");
+    
+    // re-prompt the user for if they want to change other tables
+    inquirer
+    .prompt([
+      {
+        name: "wishContinue",
+        type: "list",
+        message: "Would you like to continue?",
+        choices: ["yes", "no"]
+      },
+    ])
+    .then(answer => { 
+      if (answer.wishContinue === "yes") {
+        start();
+      } else{
+        connection.end();
+      }
+    });
+      }
+    );
+  });
+});
+ };
+
+//function to update to the role table
+// function updateRoleFunc() { };
+
+//function to update to the employee table
+// function updateEmployeeFunc() { };
