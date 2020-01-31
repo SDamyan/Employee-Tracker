@@ -15,7 +15,7 @@ const connection = mysql.createConnection({
   user: "root",
 
   // Your password
-  password: "Password123",
+  password: "",
   database: "employeeTracker_DB"
 });
 
@@ -376,7 +376,7 @@ function updateFunc() {
         console.log(results);
 
         for (var i = 0; i < results.length; i++) {
-          choiceArray.push({ name: results[i].title, value: results[i].name });
+          choiceArray.push({ name: results[i].name, value: results[i].id });
         }
         return choiceArray;
       },
@@ -390,16 +390,18 @@ function updateFunc() {
   ])
 
   .then(function(answer) {
+    console.log("Choice is", answer.updateDepChoice)
     // when finished prompting, update a new item into the db with that info
     connection.query(
       `UPDATE department SET ? WHERE ?`,
       [
         {
-          name: answer.updateDepChoice
+          name: answer.updateDepName
         },
         {
-          name: answer.updateDepName
+          id: answer.updateDepChoice
         }
+
       ], 
       //[[answer.updateDepName]], 
       function(err) {
